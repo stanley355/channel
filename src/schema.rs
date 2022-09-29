@@ -1,7 +1,7 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    channel (id) {
+    channels (id) {
         id -> Uuid,
         owner_id -> Uuid,
         created_at -> Timestamp,
