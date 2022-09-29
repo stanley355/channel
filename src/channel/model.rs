@@ -2,7 +2,7 @@ use super::req::CreateChannelReq;
 use crate::db::PgPool;
 use crate::schema::channels;
 use actix_web::web;
-use diesel::{ExpressionMethods, QueryResult, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryResult, RunQueryDsl, QueryDsl};
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
@@ -18,6 +18,11 @@ pub struct Channel {
 }
 
 impl Channel {
+    pub fn check_channel(pool: web::Data<PgPool>, name: &String) -> QueryResult<Channel> {
+        let conn = &pool.get().unwrap();
+        channels::table.filter(channels::channel_name.eq(name)).get_result(conn)
+    }
+
     pub fn create(
         pool: web::Data<PgPool>,
         body: web::Json<CreateChannelReq>,
