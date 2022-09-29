@@ -24,7 +24,7 @@ impl Channel {
     ) -> QueryResult<Channel> {
         let conn = &pool.get().unwrap();
 
-        let slug = &body.channel_name.replace(" ","");
+        let slug = &body.channel_name.trim().replace(" ","-");
         let data = (
             (channels::owner_id.eq(&body.owner_id)),
             (channels::channel_name.eq(&body.channel_name)),
