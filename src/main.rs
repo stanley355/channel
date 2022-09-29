@@ -6,6 +6,8 @@ use dotenv::dotenv;
 use std::env;
 
 mod db;
+mod channel;
+mod schema;
 
 async fn serve_web(address: String, pool: db::PgPool) -> std::io::Result<()> {
     HttpServer::new(move || {
