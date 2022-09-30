@@ -1,6 +1,6 @@
 use super::model::Channel;
 use super::req::{CheckChannelParam, CreateChannelReq};
-use super::res::ChannelTokenRes;
+use super::res::{ChannelErrorRes, ChannelTokenRes};
 use crate::db::PgPool;
 use actix_web::{get, post, web, HttpResponse};
 
@@ -17,10 +17,9 @@ async fn create_channel(
                 let token = Channel::hash_channel_data(channel);
                 HttpResponse::Ok().json(ChannelTokenRes::new(token))
             } else {
-                HttpResponse::BadRequest().body(format!(
-                    "Channel with {:?} name exists!",
-                    &body.channel_name
-                ))
+                let error_msg = format!("Channel with {:?} name exists!", &body.channel_name);
+                let error_res = ChannelErrorRes::new(error_msg);
+                HttpResponse::BadRequest().json(error_res)
             }
         }
         Err(_) => {
