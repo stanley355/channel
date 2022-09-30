@@ -15,6 +15,7 @@ pub struct Channel {
     pub slug: String,
     pub subscribers: i32,
     pub posts_number: i32,
+    pub subscription_price: i32,
 }
 
 impl Channel {
@@ -30,13 +31,8 @@ impl Channel {
         param: web::Query<CheckChannelParam>,
     ) -> QueryResult<Channel> {
         let conn = &pool.get().unwrap();
-        println!("{:?}", param);
         channels::table
-            .filter(
-                channels::owner_id
-                    .eq(&param.owner_id)
-                    .and(channels::channel_name.eq(&param.channel_name)),
-            )
+            .filter(channels::owner_id.eq(&param.owner_id))
             .get_result(conn)
     }
 
@@ -51,6 +47,7 @@ impl Channel {
             (channels::owner_id.eq(&body.owner_id)),
             (channels::channel_name.eq(&body.channel_name)),
             (channels::slug.eq(slug)),
+            (channels::subscription_price.eq(&body.subscription_price)),
         );
 
         diesel::insert_into(channels::table)

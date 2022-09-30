@@ -10,5 +10,6 @@ diesel::table! {
         slug -> Varchar,
         subscribers -> Int4,
         posts_number -> Int4,
+        subscription_price -> Int4,
     }
 }
