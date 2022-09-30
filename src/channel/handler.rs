@@ -1,5 +1,6 @@
 use super::model::Channel;
 use super::req::{CheckChannelParam, CreateChannelReq};
+use super::res::ChannelTokenRes;
 use crate::db::PgPool;
 use actix_web::{get, post, web, HttpResponse};
 
@@ -13,7 +14,8 @@ async fn create_channel(
     match channel_exist {
         Ok(channel) => {
             if body.owner_id == channel.owner_id {
-                HttpResponse::Ok().json(channel)
+                let token = Channel::hash_channel_data(channel);
+                HttpResponse::Ok().json(ChannelTokenRes::new(token))
             } else {
                 HttpResponse::BadRequest().body(format!(
                     "Channel with {:?} name exists!",
@@ -25,14 +27,17 @@ async fn create_channel(
             let channel_result = Channel::create(pool, body);
 
             match channel_result {
-                Ok(channel) => HttpResponse::Ok().json(channel),
+                Ok(channel) => {
+                    let token = Channel::hash_channel_data(channel);
+                    HttpResponse::Ok().json(ChannelTokenRes::new(token))
+                }
                 Err(err) => HttpResponse::InternalServerError().body(format!("Error: {:?}", err)),
             }
         }
     }
 }
 
-#[get("")]
+#[get("/")]
 async fn check_channel_by_owner(
     pool: web::Data<PgPool>,
     param: web::Query<CheckChannelParam>,

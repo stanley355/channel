@@ -1,9 +1,13 @@
 use super::req::{CheckChannelParam, CreateChannelReq};
 use crate::db::PgPool;
 use crate::schema::channels;
+
 use actix_web::web;
 use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+use jsonwebtokens as jwt;
+use jwt::{encode, Algorithm, AlgorithmID};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 
 #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
 pub struct Channel {
@@ -53,5 +57,12 @@ impl Channel {
         diesel::insert_into(channels::table)
             .values(data)
             .get_result::<Channel>(conn)
+    }
+
+    pub fn hash_channel_data(channel: Channel) -> String {
+        let alg = Algorithm::new_hmac(AlgorithmID::HS256, "secret").unwrap();
+        let header = json!({ "alg": alg.name() });
+        let body = json!(channel);
+        encode(&header, &body, &alg).unwrap()
     }
 }
