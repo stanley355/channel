@@ -2,7 +2,7 @@ use super::req::{CheckChannelParam, CreateChannelReq};
 use crate::db::PgPool;
 use crate::schema::channels;
 use actix_web::web;
-use diesel::{BoolExpressionMethods, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
@@ -42,7 +42,7 @@ impl Channel {
     ) -> QueryResult<Channel> {
         let conn = &pool.get().unwrap();
 
-        let slug = &body.channel_name.trim().replace(" ", "-");
+        let slug = &body.channel_name.trim().replace(" ", "-").to_lowercase();
         let data = (
             (channels::owner_id.eq(&body.owner_id)),
             (channels::channel_name.eq(&body.channel_name)),
