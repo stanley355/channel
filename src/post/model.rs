@@ -3,7 +3,7 @@ use crate::db::PgPool;
 use crate::schema::posts;
 
 use actix_web::web;
-use diesel::{ExpressionMethods, QueryResult, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
@@ -37,5 +37,14 @@ impl Post {
         diesel::insert_into(posts::table)
             .values(data)
             .get_result::<Post>(conn)
+    }
+
+    pub fn view_posts(pool: web::Data<PgPool>, channel_id: i32) -> QueryResult<Vec<Post>> {
+        let conn = &pool.get().unwrap();
+        posts::table
+            .filter(posts::channels_id.eq(channel_id))
+            .order(posts::created_at.desc())
+            .limit(10)
+            .get_results(conn)
     }
 }
