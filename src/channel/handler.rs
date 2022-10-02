@@ -1,5 +1,5 @@
 use super::model::Channel;
-use super::req::{CheckChannelParam, CreateChannelReq};
+use super::req::{CheckChannelParam, CreateChannelPayload};
 use super::res::{ChannelErrorRes, ChannelTokenRes};
 use crate::db::PgPool;
 use actix_web::{get, post, web, HttpResponse};
@@ -7,7 +7,7 @@ use actix_web::{get, post, web, HttpResponse};
 #[post("/")]
 async fn create_channel(
     pool: web::Data<PgPool>,
-    body: web::Json<CreateChannelReq>,
+    body: web::Json<CreateChannelPayload>,
 ) -> HttpResponse {
     let channel_exist = Channel::check_channel(pool.clone(), &body.channel_name);
 

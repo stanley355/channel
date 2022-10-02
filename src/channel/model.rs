@@ -1,4 +1,4 @@
-use super::req::{CheckChannelParam, CreateChannelReq};
+use super::req::{CheckChannelParam, CreateChannelPayload};
 use crate::db::PgPool;
 use crate::schema::channels;
 
@@ -42,7 +42,7 @@ impl Channel {
 
     pub fn create(
         pool: web::Data<PgPool>,
-        body: web::Json<CreateChannelReq>,
+        body: web::Json<CreateChannelPayload>,
     ) -> QueryResult<Channel> {
         let conn = &pool.get().unwrap();
 

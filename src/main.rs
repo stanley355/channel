@@ -8,6 +8,7 @@ use std::env;
 mod channel;
 mod db;
 mod schema;
+mod post;
 
 async fn serve_web(address: String, pool: db::PgPool) -> std::io::Result<()> {
     HttpServer::new(move || {

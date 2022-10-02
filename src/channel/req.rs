@@ -2,7 +2,7 @@ use diesel::Queryable;
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
-pub struct CreateChannelReq {
+pub struct CreateChannelPayload {
     pub owner_id: String,
     pub channel_name: String,
     pub subscription_price: i32,

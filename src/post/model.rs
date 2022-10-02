@@ -1,3 +1,10 @@
+use crate::db::PgPool;
+use crate::schema::posts;
+use super::req::CreatePostPayload;
+
+use actix_web::web;
+use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+use serde::{Deserialize, Serialize};
 
 
 
@@ -11,4 +18,25 @@ pub struct Post {
     likes: i32,
     post_type: String,
     is_free: bool,
+}
+
+impl Post {
+    pub fn create(
+        pool: web::Data<PgPool>,
+        body: web::Json<CreatePostPayload>,
+    ) -> QueryResult<Post> {
+        let conn = &pool.get().unwrap();
+
+        let data = (
+            (posts::channels_id.eq(&body.channels_id)),
+            (posts::img_url.eq(&body.img_url)),
+            (posts::description.eq(&body.description)),
+            (posts::post_type.eq(&body.post_type)),
+            (posts::is_free.eq(&body.is_free))
+        );
+
+        diesel::insert_into(posts::table)
+            .values(data)
+            .get_result::<Post>(conn)
+    }
 }
