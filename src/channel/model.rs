@@ -11,7 +11,7 @@ use serde_json::json;
 
 #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
 pub struct Channel {
-    pub id: uuid::Uuid,
+    pub id: i32,
     pub owner_id: String,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
