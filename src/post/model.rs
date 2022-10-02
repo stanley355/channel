@@ -1,12 +1,10 @@
+use super::req::CreatePostPayload;
 use crate::db::PgPool;
 use crate::schema::posts;
-use super::req::CreatePostPayload;
 
 use actix_web::web;
-use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryResult, RunQueryDsl};
 use serde::{Deserialize, Serialize};
-
-
 
 #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
 pub struct Post {
@@ -31,8 +29,8 @@ impl Post {
             (posts::channels_id.eq(&body.channels_id)),
             (posts::img_url.eq(&body.img_url)),
             (posts::description.eq(&body.description)),
-            (posts::post_type.eq(&body.post_type)),
-            (posts::is_free.eq(&body.is_free))
+            (posts::post_type.eq(body.post_type.to_string())),
+            (posts::is_free.eq(&body.is_free)),
         );
 
         diesel::insert_into(posts::table)
