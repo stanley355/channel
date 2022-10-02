@@ -25,11 +25,12 @@ impl Post {
     ) -> QueryResult<Post> {
         let conn = &pool.get().unwrap();
 
+        let post_type = body.post_type.to_string();
         let data = (
             (posts::channels_id.eq(&body.channels_id)),
             (posts::img_url.eq(&body.img_url)),
             (posts::description.eq(&body.description)),
-            (posts::post_type.eq(body.post_type.to_string())),
+            (posts::post_type.eq(&post_type)),
             (posts::is_free.eq(&body.is_free)),
         );
 

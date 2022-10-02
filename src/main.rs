@@ -15,6 +15,7 @@ async fn serve_web(address: String, pool: db::PgPool) -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .service(web::scope("/v1/channel").configure(channel::handler::route))
+            .service(web::scope("/v1/post").configure(post::handler::route))
     })
     .bind(address)?
     .run()
