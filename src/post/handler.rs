@@ -18,9 +18,9 @@ async fn view_posts(
     pool: web::Data<PgPool>,
     param: web::Query<ViewChannelPostParam>,
 ) -> HttpResponse {
-    let post_exist = Post::view_posts(pool, param.channel_id);
+    let post_list = Post::view_posts(pool, param.slug.clone());
 
-    match post_exist {
+    match post_list {
         Ok(post) => HttpResponse::Ok().json(post),
         Err(err) => HttpResponse::BadRequest().body(format!("Error: {:?}", err)),
     }

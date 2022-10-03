@@ -16,7 +16,7 @@ diesel::table! {
 
 diesel::table! {
     posts (id) {
-        id -> Int4,
+        id -> Varchar,
         channels_id -> Int4,
         created_at -> Timestamp,
         img_url -> Varchar,
