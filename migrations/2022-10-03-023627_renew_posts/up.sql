@@ -1,7 +1,8 @@
 -- Your SQL goes here
 CREATE TABLE posts (
-  id VARCHAR PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   channels_id INTEGER NOT NULL,
+  channels_slug VARCHAR NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
   img_url VARCHAR NOT NULL,
   description VARCHAR NOT NULL,

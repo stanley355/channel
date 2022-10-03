@@ -8,8 +8,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
 pub struct Post {
-    id: String,
+    id: i32,
     channels_id: i32,
+    channels_slug: String,
     created_at: chrono::NaiveDateTime,
     img_url: String,
     description: String,
@@ -27,8 +28,8 @@ impl Post {
 
         let post_type = body.post_type.to_string();
         let data = (
-            (posts::id.eq(&body.channels_slug)),
             (posts::channels_id.eq(&body.channels_id)),
+            (posts::channels_slug.eq(&body.channels_slug)),
             (posts::img_url.eq(&body.img_url)),
             (posts::description.eq(&body.description)),
             (posts::post_type.eq(&post_type)),
@@ -43,7 +44,7 @@ impl Post {
     pub fn view_posts(pool: web::Data<PgPool>, slug: String) -> QueryResult<Vec<Post>> {
         let conn = &pool.get().unwrap();
         posts::table
-            .filter(posts::id.eq(slug))
+            .filter(posts::channels_slug.eq(slug))
             .order(posts::created_at.desc())
             .limit(10)
             .get_results(conn)
