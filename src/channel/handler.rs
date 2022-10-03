@@ -44,7 +44,10 @@ async fn check_channel_by_owner(
     let channel_exist = Channel::check_channel_by_owner(pool, param);
 
     match channel_exist {
-        Ok(channel) => HttpResponse::Ok().json(channel),
+        Ok(channel) => {
+            let token = Channel::hash_channel_data(channel);
+            HttpResponse::Ok().json(ChannelTokenRes::new(token))
+        }
         Err(_) => HttpResponse::BadRequest().body("Error: Channel doesn't exist!"),
     }
 }
