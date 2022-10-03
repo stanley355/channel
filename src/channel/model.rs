@@ -65,4 +65,13 @@ impl Channel {
         let body = json!(channel);
         encode(&header, &body, &alg).unwrap()
     }
+
+    pub fn update_posts_count(pool: web::Data<PgPool>, id: i32) -> QueryResult<usize> {
+        let conn = &pool.get().unwrap();
+
+        diesel::update(channels::table)
+            .filter(channels::id.eq(id))
+            .set(channels::posts_number.eq(channels::posts_number + 1))
+            .execute(conn)
+    }
 }

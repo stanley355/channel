@@ -1,14 +1,23 @@
 use super::req::CreatePostPayload;
 use super::{model::Post, req::ViewChannelPostParam};
+use crate::channel::model::Channel;
 use crate::db::PgPool;
+use actix_web::web::Json;
 use actix_web::{get, post, web, HttpResponse};
 
 #[post("/")]
 async fn create_post(pool: web::Data<PgPool>, body: web::Json<CreatePostPayload>) -> HttpResponse {
-    let create_post = Post::create(pool, body);
+    let create_post = Post::create(pool.clone(), Json(body.clone()));
 
     match create_post {
-        Ok(post) => HttpResponse::Ok().json(post),
+        Ok(post) => {
+            let update_count = Channel::update_posts_count(pool.clone(), body.channels_id);
+            match update_count {
+                Ok(_) => println!("Post count updated"),
+                Err(err) => println!("Fail to update count: {:?}", err),
+            };
+            HttpResponse::Ok().json(post)
+        }
         Err(err) => HttpResponse::InternalServerError().body(format!("Error:{:?}", err)),
     }
 }
