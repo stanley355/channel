@@ -9,10 +9,10 @@ use jwt::{encode, Algorithm, AlgorithmID};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-#[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
+#[derive(Queryable, Debug, Clone, Deserialize, Serialize, AsExpression)]
 pub struct Channel {
     pub id: i32,
-    pub owner_id: String,
+    pub owner_id: uuid::Uuid,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
     pub channel_name: String,
@@ -27,7 +27,7 @@ impl Channel {
         let conn = &pool.get().unwrap();
         channels::table
             .filter(channels::channel_name.eq(name))
-            .get_result(conn)
+            .get_result::<Channel>(conn)
     }
 
     pub fn check_channel_by_owner(
@@ -35,8 +35,10 @@ impl Channel {
         param: web::Query<CheckChannelParam>,
     ) -> QueryResult<Channel> {
         let conn = &pool.get().unwrap();
+        let uuid = uuid::Uuid::parse_str(&param.owner_id).unwrap();
+
         channels::table
-            .filter(channels::owner_id.eq(&param.owner_id))
+            .filter(channels::owner_id.eq(uuid))
             .get_result(conn)
     }
 
@@ -45,10 +47,11 @@ impl Channel {
         body: web::Json<CreateChannelPayload>,
     ) -> QueryResult<Channel> {
         let conn = &pool.get().unwrap();
-
+        let uuid = uuid::Uuid::parse_str(&body.owner_id).unwrap();
         let slug = &body.channel_name.trim().replace(" ", "-").to_lowercase();
+        
         let data = (
-            (channels::owner_id.eq(&body.owner_id)),
+            (channels::owner_id.eq(uuid)),
             (channels::channel_name.eq(&body.channel_name)),
             (channels::slug.eq(slug)),
             (channels::subscription_price.eq(&body.subscription_price)),

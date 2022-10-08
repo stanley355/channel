@@ -3,7 +3,7 @@
 diesel::table! {
     channels (id) {
         id -> Int4,
-        owner_id -> Varchar,
+        owner_id -> Uuid,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         channel_name -> Varchar,
