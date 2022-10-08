@@ -13,7 +13,9 @@ async fn create_channel(
 
     match channel_exist {
         Ok(channel) => {
-            if body.owner_id == channel.owner_id {
+            let uuid = uuid::Uuid::parse_str(&body.owner_id);
+
+            if uuid.unwrap() == channel.owner_id {
                 let token = Channel::hash_channel_data(channel);
                 HttpResponse::Ok().json(ChannelTokenRes::new(token))
             } else {
