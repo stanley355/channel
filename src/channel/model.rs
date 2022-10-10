@@ -1,4 +1,4 @@
-use super::req::*;
+use super::req::CreateChannelPayload;
 use crate::db::PgPool;
 use crate::schema::channels;
 
@@ -32,24 +32,21 @@ impl Channel {
 
     pub fn check_channel_by_owner(
         pool: web::Data<PgPool>,
-        param: web::Query<OwnerIdParam>,
+        owner_id: String,
     ) -> QueryResult<Channel> {
         let conn = &pool.get().unwrap();
-        let uuid = uuid::Uuid::parse_str(&param.owner_id).unwrap();
+        let uuid = uuid::Uuid::parse_str(&owner_id).unwrap();
 
         channels::table
             .filter(channels::owner_id.eq(uuid))
             .get_result(conn)
     }
 
-    pub fn check_channel_by_slug(
-        pool: web::Data<PgPool>,
-        param: web::Query<ChannelSlugParam>,
-    ) -> QueryResult<Channel> {
+    pub fn check_channel_by_slug(pool: web::Data<PgPool>, slug: String) -> QueryResult<Channel> {
         let conn = &pool.get().unwrap();
 
         channels::table
-            .filter(channels::slug.eq(&param.slug))
+            .filter(channels::slug.eq(&slug))
             .get_result(conn)
     }
 

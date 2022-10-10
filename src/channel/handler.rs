@@ -39,37 +39,32 @@ async fn create_channel(
 }
 
 #[get("/")]
-async fn check_channel_by_owner(
+async fn check_channel(
     pool: web::Data<PgPool>,
-    param: web::Query<OwnerIdParam>,
+    param: web::Query<CheckChannelParam>,
 ) -> HttpResponse {
-    let channel_exist = Channel::check_channel_by_owner(pool, param);
+    if let Some(owner_id) = param.owner_id.clone() {
+        let channel_exist = Channel::check_channel_by_owner(pool, owner_id);
 
-    match channel_exist {
-        Ok(channel) => {
-            let token = Channel::hash_channel_data(channel);
-            HttpResponse::Ok().json(ChannelTokenRes::new(token))
+        match channel_exist {
+            Ok(channel) => {
+                let token = Channel::hash_channel_data(channel);
+                HttpResponse::Ok().json(ChannelTokenRes::new(token))
+            }
+            Err(_) => HttpResponse::BadRequest().body("Error: Channel doesn't exist!"),
         }
-        Err(_) => HttpResponse::BadRequest().body("Error: Channel doesn't exist!"),
-    }
-}
+    } else if let Some(slug) = param.slug.clone() {
+        let channel_exist = Channel::check_channel_by_slug(pool, slug);
 
-#[get("/")]
-async fn check_channel_by_slug(
-    pool: web::Data<PgPool>,
-    param: web::Query<ChannelSlugParam>,
-) -> HttpResponse {
-    let channel_exist = Channel::check_channel_by_slug(pool, param);
-
-    match channel_exist {
-        Ok(channel) => HttpResponse::Ok().json(channel),
-        Err(_) => HttpResponse::BadRequest().body("Error: Channel doesn't exist!"),
+        match channel_exist {
+            Ok(channel) => HttpResponse::Ok().json(channel),
+            Err(_) => HttpResponse::BadRequest().body("Error: Channel doesn't exist!"),
+        }
+    } else {
+        HttpResponse::BadRequest().body("Missing Parameter")
     }
 }
 
 pub fn route(config: &mut web::ServiceConfig) {
-    config
-        .service(create_channel)
-        .service(check_channel_by_owner)
-        .service(check_channel_by_slug);
+    config.service(create_channel).service(check_channel);
 }

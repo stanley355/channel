@@ -9,11 +9,7 @@ pub struct CreateChannelPayload {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct OwnerIdParam {
-    pub owner_id: String,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ChannelSlugParam {
-    pub slug: String,
+pub struct CheckChannelParam {
+    pub owner_id: Option<String>,
+    pub slug: Option<String>,
 }
