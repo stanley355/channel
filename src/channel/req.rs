@@ -8,7 +8,12 @@ pub struct CreateChannelPayload {
     pub subscription_price: i32,
 }
 
-#[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct OwnerIdParam {
     pub owner_id: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ChannelSlugParam {
+    pub slug: String,
 }

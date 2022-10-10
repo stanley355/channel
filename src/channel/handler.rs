@@ -1,5 +1,5 @@
 use super::model::Channel;
-use super::req::{OwnerIdParam, CreateChannelPayload};
+use super::req::*;
 use super::res::{ChannelErrorRes, ChannelTokenRes};
 use crate::db::PgPool;
 use actix_web::{get, post, web, HttpResponse};
@@ -54,8 +54,22 @@ async fn check_channel_by_owner(
     }
 }
 
+#[get("/")]
+async fn check_channel_by_slug(
+    pool: web::Data<PgPool>,
+    param: web::Query<ChannelSlugParam>,
+) -> HttpResponse {
+    let channel_exist = Channel::check_channel_by_slug(pool, param);
+
+    match channel_exist {
+        Ok(channel) => HttpResponse::Ok().json(channel),
+        Err(_) => HttpResponse::BadRequest().body("Error: Channel doesn't exist!"),
+    }
+}
+
 pub fn route(config: &mut web::ServiceConfig) {
     config
         .service(create_channel)
-        .service(check_channel_by_owner);
+        .service(check_channel_by_owner)
+        .service(check_channel_by_slug);
 }

@@ -1,4 +1,4 @@
-use super::req::{OwnerIdParam, CreateChannelPayload};
+use super::req::*;
 use crate::db::PgPool;
 use crate::schema::channels;
 
@@ -42,6 +42,17 @@ impl Channel {
             .get_result(conn)
     }
 
+    pub fn check_channel_by_slug(
+        pool: web::Data<PgPool>,
+        param: web::Query<ChannelSlugParam>,
+    ) -> QueryResult<Channel> {
+        let conn = &pool.get().unwrap();
+
+        channels::table
+            .filter(channels::slug.eq(&param.slug))
+            .get_result(conn)
+    }
+
     pub fn create(
         pool: web::Data<PgPool>,
         body: web::Json<CreateChannelPayload>,
@@ -49,7 +60,7 @@ impl Channel {
         let conn = &pool.get().unwrap();
         let uuid = uuid::Uuid::parse_str(&body.owner_id).unwrap();
         let slug = &body.channel_name.trim().replace(" ", "-").to_lowercase();
-        
+
         let data = (
             (channels::owner_id.eq(uuid)),
             (channels::channel_name.eq(&body.channel_name)),
