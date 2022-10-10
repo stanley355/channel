@@ -1,5 +1,5 @@
 use super::model::Channel;
-use super::req::{CheckChannelParam, CreateChannelPayload};
+use super::req::{OwnerIdParam, CreateChannelPayload};
 use super::res::{ChannelErrorRes, ChannelTokenRes};
 use crate::db::PgPool;
 use actix_web::{get, post, web, HttpResponse};
@@ -41,7 +41,7 @@ async fn create_channel(
 #[get("/")]
 async fn check_channel_by_owner(
     pool: web::Data<PgPool>,
-    param: web::Query<CheckChannelParam>,
+    param: web::Query<OwnerIdParam>,
 ) -> HttpResponse {
     let channel_exist = Channel::check_channel_by_owner(pool, param);
 

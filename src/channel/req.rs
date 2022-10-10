@@ -9,6 +9,6 @@ pub struct CreateChannelPayload {
 }
 
 #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
-pub struct CheckChannelParam {
+pub struct OwnerIdParam {
     pub owner_id: String,
 }
