@@ -20,6 +20,8 @@ pub struct Channel {
     pub subscribers: i32,
     pub posts_number: i32,
     pub subscription_price: i32,
+    pub profile_img_url: Option<String>,
+    pub background_img_url: Option<String>,
 }
 
 impl Channel {

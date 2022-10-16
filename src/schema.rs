@@ -11,6 +11,8 @@ diesel::table! {
         subscribers -> Int4,
         posts_number -> Int4,
         subscription_price -> Int4,
+        profile_img_url -> Nullable<Varchar>,
+        background_img_url -> Nullable<Varchar>,
     }
 }
 
