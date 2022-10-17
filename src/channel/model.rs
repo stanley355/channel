@@ -65,6 +65,7 @@ impl Channel {
             (channels::channel_name.eq(&body.channel_name)),
             (channels::slug.eq(slug)),
             (channels::subscription_price.eq(&body.subscription_price)),
+            (channels::profile_img_url.eq(&body.profile_img_url))
         );
 
         diesel::insert_into(channels::table)
