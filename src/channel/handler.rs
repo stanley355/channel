@@ -2,7 +2,7 @@ use super::model::Channel;
 use super::req::*;
 use super::res::{ChannelErrorRes, ChannelTokenRes};
 use crate::db::PgPool;
-use actix_web::{get, post, web, HttpResponse};
+use actix_web::{get, post, put, web, HttpResponse};
 
 #[post("/")]
 async fn create_channel(
@@ -65,6 +65,22 @@ async fn check_channel(
     }
 }
 
+#[put("/")]
+async fn update_channel(
+    pool: web::Data<PgPool>,
+    param: web::Query<UpdateChannelParam>,
+) -> HttpResponse {
+    let channel_update = Channel::update_subscribers_count(pool, param.channel_id);
+
+    match channel_update {
+        Ok(update) => HttpResponse::Ok().json(update),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error : {:?}", err)),
+    }
+}
+
 pub fn route(config: &mut web::ServiceConfig) {
-    config.service(create_channel).service(check_channel);
+    config
+        .service(create_channel)
+        .service(check_channel)
+        .service(update_channel);
 }

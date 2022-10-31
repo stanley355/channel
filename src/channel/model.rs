@@ -88,4 +88,13 @@ impl Channel {
             .set(channels::posts_number.eq(channels::posts_number + 1))
             .execute(conn)
     }
+
+    pub fn update_subscribers_count(pool: web::Data<PgPool>, id: i32) -> QueryResult<usize> {
+        let conn = &pool.get().unwrap();
+
+        diesel::update(channels::table)
+            .filter(channels::id.eq(id))
+            .set(channels::subscribers.eq(channels::subscribers + 1))
+            .execute(conn)
+    }
 }

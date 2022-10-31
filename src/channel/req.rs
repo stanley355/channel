@@ -14,3 +14,9 @@ pub struct CheckChannelParam {
     pub owner_id: Option<String>,
     pub slug: Option<String>,
 }
+
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct UpdateChannelParam {
+    pub channel_id: i32,
+}
