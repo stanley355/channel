@@ -66,7 +66,7 @@ async fn check_channel(
 }
 
 #[put("/")]
-async fn update_channel(
+async fn update_channel_subscribers(
     pool: web::Data<PgPool>,
     param: web::Query<UpdateChannelParam>,
 ) -> HttpResponse {
@@ -82,5 +82,5 @@ pub fn route(config: &mut web::ServiceConfig) {
     config
         .service(create_channel)
         .service(check_channel)
-        .service(update_channel);
+        .service(update_channel_subscribers);
 }
