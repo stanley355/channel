@@ -15,3 +15,8 @@ pub struct CreatePostPayload {
 pub struct ViewChannelPostParam {
     pub slug: String,
 }
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ViewHomePostsPayload {
+    pub subscriptions: Vec<i32>,
+}

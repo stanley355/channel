@@ -1,4 +1,4 @@
-use super::req::CreatePostPayload;
+use super::req::{CreatePostPayload, ViewHomePostsPayload};
 use super::{model::Post, req::ViewChannelPostParam};
 use crate::channel::model::Channel;
 use crate::db::PgPool;
@@ -35,6 +35,22 @@ async fn view_posts(
     }
 }
 
+#[get("/home/")]
+async fn view_home_posts(
+    pool: web::Data<PgPool>,
+    body: web::Json<ViewHomePostsPayload>,
+) -> HttpResponse {
+    let posts_result = Post::view_home_posts(pool, body.subscriptions.clone());
+
+    match posts_result {
+        Ok(posts) => HttpResponse::Ok().json(posts),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error: {:?}", err)),
+    }
+}
+
 pub fn route(config: &mut web::ServiceConfig) {
-    config.service(create_post).service(view_posts);
+    config
+        .service(create_post)
+        .service(view_posts)
+        .service(view_home_posts);
 }

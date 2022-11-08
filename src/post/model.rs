@@ -3,7 +3,7 @@ use crate::db::PgPool;
 use crate::schema::posts;
 
 use actix_web::web;
-use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+use diesel::{BoolExpressionMethods, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
@@ -47,5 +47,27 @@ impl Post {
             .filter(posts::channels_slug.eq(slug))
             .order(posts::created_at.desc())
             .get_results(conn)
+    }
+
+    pub fn view_home_posts(
+        pool: web::Data<PgPool>,
+        subscriptions: Vec<i32>,
+    ) -> QueryResult<Vec<Post>> {
+        let conn = &pool.get().unwrap();
+
+        match subscriptions.len() {
+            0 => posts::table
+                .filter(posts::is_free.eq(true))
+                .order(posts::created_at.desc())
+                .get_results(conn),
+            _ => posts::table
+                .filter(
+                    posts::channels_id
+                        .eq_any(subscriptions)
+                        .or(posts::is_free.eq(true)),
+                )
+                .order(posts::created_at.desc())
+                .get_results(conn),
+        }
     }
 }
