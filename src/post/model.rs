@@ -46,7 +46,6 @@ impl Post {
         posts::table
             .filter(posts::channels_slug.eq(slug))
             .order(posts::created_at.desc())
-            .limit(10)
             .get_results(conn)
     }
 }
