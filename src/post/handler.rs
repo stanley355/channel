@@ -40,7 +40,10 @@ async fn view_home_posts(
     pool: web::Data<PgPool>,
     body: web::Json<ViewHomePostsPayload>,
 ) -> HttpResponse {
-    let posts_result = Post::view_home_posts(pool, body.subscriptions.clone());
+    let posts_result = match body.subscriptions.len() {
+        0 => Post::view_free_posts(pool),
+        _ => Post::view_home_posts(pool, body.subscriptions.clone()),
+    };
 
     match posts_result {
         Ok(posts) => HttpResponse::Ok().json(posts),

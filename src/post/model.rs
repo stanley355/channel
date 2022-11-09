@@ -49,25 +49,28 @@ impl Post {
             .get_results(conn)
     }
 
+    pub fn view_free_posts(pool: web::Data<PgPool>) -> QueryResult<Vec<Post>> {
+        let conn = &pool.get().unwrap();
+
+        posts::table
+            .filter(posts::is_free.eq(true))
+            .order(posts::created_at.desc())
+            .get_results(conn)
+    }
+
     pub fn view_home_posts(
         pool: web::Data<PgPool>,
         subscriptions: Vec<i32>,
     ) -> QueryResult<Vec<Post>> {
         let conn = &pool.get().unwrap();
 
-        match subscriptions.len() {
-            0 => posts::table
-                .filter(posts::is_free.eq(true))
-                .order(posts::created_at.desc())
-                .get_results(conn),
-            _ => posts::table
-                .filter(
-                    posts::channels_id
-                        .eq_any(subscriptions)
-                        .or(posts::is_free.eq(true)),
-                )
-                .order(posts::created_at.desc())
-                .get_results(conn),
-        }
+        posts::table
+            .filter(
+                posts::channels_id
+                    .eq_any(subscriptions)
+                    .or(posts::is_free.eq(true)),
+            )
+            .order(posts::created_at.desc())
+            .get_results(conn)
     }
 }
