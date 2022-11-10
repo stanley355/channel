@@ -1,4 +1,5 @@
 use super::req::CreatePostPayload;
+use super::res::HomePost;
 use crate::db::PgPool;
 use crate::schema::{channels, posts};
 
@@ -21,14 +22,6 @@ pub struct Post {
     post_type: String,
     is_free: bool,
 }
-
-// #[derive(Queryable, Debug, Clone, Deserialize, Serialize)]
-// pub struct Poster {
-//     id: i32,
-//     channels_id: i32,
-//     channels_slug: String,
-//     channel_name: String,
-// }
 
 impl Post {
     pub fn create(
@@ -60,40 +53,50 @@ impl Post {
             .get_results(conn)
     }
 
-    pub fn view_free_posts(pool: web::Data<PgPool>) -> QueryResult<Vec<Post>> {
+    pub fn view_free_posts(pool: web::Data<PgPool>) -> QueryResult<Vec<Option<HomePost>>> {
         let conn = &pool.get().unwrap();
 
+        let selection = (
+            posts::id,
+            posts::channels_id,
+            posts::channels_slug,
+            posts::created_at,
+            posts::img_url,
+            posts::description,
+            posts::likes,
+            posts::post_type,
+            posts::is_free,
+            channels::channel_name,
+            channels::profile_img_url,
+        );
         posts::table
             .filter(posts::is_free.eq(true))
             .order(posts::created_at.desc())
             .limit(20)
+            .left_join(channels::table.on(posts::channels_id.eq(channels::id)))
+            .select(selection.nullable())
             .get_results(conn)
     }
 
     pub fn view_home_posts(
         pool: web::Data<PgPool>,
         subscriptions: Vec<i32>,
-    ) -> QueryResult<Vec<Post>> {
+    ) -> QueryResult<Vec<Option<HomePost>>> {
         let conn = &pool.get().unwrap();
 
-        // let selection = (
-        //     posts::id,
-        //     posts::channels_id,
-        //     posts::channels_slug,
-        //     channels::channel_name,
-        // );
-
-        // posts::table
-        //     .filter(
-        //         posts::channels_id
-        //             .eq_any(subscriptions)
-        //             .or(posts::is_free.eq(true)),
-        //     )
-        //     .order(posts::created_at.desc())
-        //     .left_join(channels::table.on(posts::channels_id.eq(channels::id)))
-        //     .select(selection.nullable())
-        //     .get_results(conn)
-
+        let selection = (
+            posts::id,
+            posts::channels_id,
+            posts::channels_slug,
+            posts::created_at,
+            posts::img_url,
+            posts::description,
+            posts::likes,
+            posts::post_type,
+            posts::is_free,
+            channels::channel_name,
+            channels::profile_img_url,
+        );
 
         posts::table
             .filter(
@@ -102,6 +105,9 @@ impl Post {
                     .or(posts::is_free.eq(true)),
             )
             .order(posts::created_at.desc())
-            .get_results(conn)
+            .limit(20)
+            .left_join(channels::table.on(posts::channels_id.eq(channels::id)))
+            .select(selection.nullable())
+            .get_results::<Option<HomePost>>(conn)
     }
 }
