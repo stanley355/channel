@@ -78,9 +78,22 @@ async fn update_channel_subscribers(
     }
 }
 
+#[get("/search/")]
+async fn search_similar_channel(
+    pool: web::Data<PgPool>,
+    query: web::Query<SearchSimilarChannelQuery>,
+) -> HttpResponse {
+    let similar_channel = Channel::search_similar_channel(pool, query);
+
+    match similar_channel {
+        Ok(channels) => HttpResponse::Ok().json(channels),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error : {:?}", err)),
+    }
+}
 pub fn route(config: &mut web::ServiceConfig) {
     config
         .service(create_channel)
         .service(check_channel)
-        .service(update_channel_subscribers);
+        .service(update_channel_subscribers)
+        .service(search_similar_channel);
 }

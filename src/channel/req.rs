@@ -23,5 +23,5 @@ pub struct UpdateChannelParam {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SearchSimilarChannelQuery{
-    pub channel_query: String,
+    pub channel_name: String,
 }

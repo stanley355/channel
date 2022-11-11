@@ -1,4 +1,4 @@
-use super::req::CreateChannelPayload;
+use super::req::{CreateChannelPayload, SearchSimilarChannelQuery};
 use crate::db::PgPool;
 use crate::schema::channels;
 
@@ -98,10 +98,10 @@ impl Channel {
             .execute(conn)
     }
 
-    pub fn search_similar_channel(pool: web::Data<PgPool>, channel_query: String) -> QueryResult<Vec<Channel>> {
+    pub fn search_similar_channel(pool: web::Data<PgPool>, query: web::Query<SearchSimilarChannelQuery>) -> QueryResult<Vec<Channel>> {
         let conn = &pool.get().unwrap();
 
-        let query = format!("{}%", channel_query);
+        let query = format!("{}%", query.channel_name);
 
         channels::table
             .filter(channels::channel_name.like(query))
