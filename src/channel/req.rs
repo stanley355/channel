@@ -15,8 +15,13 @@ pub struct CheckChannelParam {
     pub slug: Option<String>,
 }
 
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct UpdateChannelParam {
     pub channel_id: i32,
+}
+
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct SearchSimilarChannelQuery{
+    pub channel_query: String,
 }

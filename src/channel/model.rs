@@ -3,7 +3,7 @@ use crate::db::PgPool;
 use crate::schema::channels;
 
 use actix_web::web;
-use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, TextExpressionMethods};
 use jsonwebtokens as jwt;
 use jwt::{encode, Algorithm, AlgorithmID};
 use serde::{Deserialize, Serialize};
@@ -96,5 +96,15 @@ impl Channel {
             .filter(channels::id.eq(id))
             .set(channels::subscribers.eq(channels::subscribers + 1))
             .execute(conn)
+    }
+
+    pub fn search_similar_channel(pool: web::Data<PgPool>, channel_query: String) -> QueryResult<Vec<Channel>> {
+        let conn = &pool.get().unwrap();
+
+        let query = format!("{}%", channel_query);
+
+        channels::table
+            .filter(channels::channel_name.like(query))
+            .get_results(conn)
     }
 }
