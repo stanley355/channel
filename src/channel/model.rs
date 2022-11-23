@@ -1,4 +1,4 @@
-use super::req::{CreateChannelPayload, SearchSimilarChannelQuery};
+use super::req::{CreateChannelPayload, SearchSimilarChannelQuery, UpdateChannelPayload};
 use crate::db::PgPool;
 use crate::schema::channels;
 
@@ -52,20 +52,24 @@ impl Channel {
             .get_result(conn)
     }
 
+    pub fn create_channel_slug(channel_name: String) -> String {
+        channel_name.trim().replace(" ", "-").to_lowercase()
+    }
+
     pub fn create(
         pool: web::Data<PgPool>,
         body: web::Json<CreateChannelPayload>,
     ) -> QueryResult<Channel> {
         let conn = &pool.get().unwrap();
         let uuid = uuid::Uuid::parse_str(&body.owner_id).unwrap();
-        let slug = &body.channel_name.trim().replace(" ", "-").to_lowercase();
+        let slug = Self::create_channel_slug(body.channel_name.clone());
 
         let data = (
             (channels::owner_id.eq(uuid)),
             (channels::channel_name.eq(&body.channel_name)),
             (channels::slug.eq(slug)),
             (channels::subscription_price.eq(&body.subscription_price)),
-            (channels::profile_img_url.eq(&body.profile_img_url))
+            (channels::profile_img_url.eq(&body.profile_img_url)),
         );
 
         diesel::insert_into(channels::table)
@@ -98,7 +102,10 @@ impl Channel {
             .execute(conn)
     }
 
-    pub fn search_similar_channel(pool: web::Data<PgPool>, query: web::Query<SearchSimilarChannelQuery>) -> QueryResult<Vec<Channel>> {
+    pub fn search_similar_channel(
+        pool: web::Data<PgPool>,
+        query: web::Query<SearchSimilarChannelQuery>,
+    ) -> QueryResult<Vec<Channel>> {
         let conn = &pool.get().unwrap();
 
         let query = format!("{}%", query.channel_name);
@@ -106,5 +113,36 @@ impl Channel {
         channels::table
             .filter(channels::channel_name.like(query))
             .get_results(conn)
+    }
+
+    pub fn update(
+        pool: web::Data<PgPool>,
+        payload: web::Json<UpdateChannelPayload>,
+    ) -> QueryResult<Channel> {
+        let conn = &pool.get().unwrap();
+
+        #[derive(AsChangeset)]
+        #[table_name = "channels"]
+        struct UpdatePayload {
+            channel_name: Option<String>,
+            slug: Option<String>,
+            subscription_price: Option<i32>,
+            profile_img_url: Option<String>,
+        }
+
+        let data = UpdatePayload {
+            channel_name: payload.channel_name.clone(),
+            slug: match payload.channel_name.clone() {
+                Some(channel_name) => Some(Self::create_channel_slug(channel_name)),
+                None => None,
+            },
+            subscription_price: payload.subscription_price.clone(),
+            profile_img_url: payload.profile_img_url.clone(),
+        };
+
+        diesel::update(channels::table)
+            .filter(channels::id.eq(payload.channel_id))
+            .set(data)
+            .get_result(conn)
     }
 }

@@ -20,8 +20,15 @@ pub struct UpdateChannelParam {
     pub channel_id: i32,
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct UpdateChannelPayload {
+    pub channel_id: i32,
+    pub channel_name: Option<String>,
+    pub subscription_price: Option<i32>,
+    pub profile_img_url: Option<String>,
+}
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct SearchSimilarChannelQuery{
+pub struct SearchSimilarChannelQuery {
     pub channel_name: String,
 }

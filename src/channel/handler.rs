@@ -65,6 +65,20 @@ async fn check_channel(
     }
 }
 
+
+#[put("/")]
+async fn update_channel_data(
+    pool: web::Data<PgPool>,
+    payload: web::Json<UpdateChannelPayload>,
+) -> HttpResponse {
+    let channel_update = Channel::update(pool, payload);
+
+    match channel_update {
+        Ok(update) => HttpResponse::Ok().json(update),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error : {:?}", err)),
+    }
+}
+
 #[put("/subscribers/")]
 async fn update_channel_subscribers(
     pool: web::Data<PgPool>,
@@ -94,6 +108,7 @@ pub fn route(config: &mut web::ServiceConfig) {
     config
         .service(create_channel)
         .service(check_channel)
+        .service(update_channel_data)
         .service(update_channel_subscribers)
         .service(search_similar_channel);
 }
