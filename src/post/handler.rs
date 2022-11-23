@@ -27,10 +27,17 @@ async fn view_posts(
     pool: web::Data<PgPool>,
     param: web::Query<ViewChannelPostParam>,
 ) -> HttpResponse {
-    let post_list = Post::view_posts(pool, param.slug.clone());
+    let channel_res = Channel::check_channel_by_slug(pool.clone(), param.slug.clone());
 
-    match post_list {
-        Ok(post) => HttpResponse::Ok().json(post),
+    match channel_res {
+        Ok(channel) => {
+            let post_list = Post::view_posts(pool, channel.id);
+
+            match post_list {
+                Ok(post) => HttpResponse::Ok().json(post),
+                Err(err) => HttpResponse::BadRequest().body(format!("Error: {:?}", err)),
+            }
+        }
         Err(err) => HttpResponse::BadRequest().body(format!("Error: {:?}", err)),
     }
 }

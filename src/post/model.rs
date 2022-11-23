@@ -45,10 +45,10 @@ impl Post {
             .get_result::<Post>(conn)
     }
 
-    pub fn view_posts(pool: web::Data<PgPool>, slug: String) -> QueryResult<Vec<Post>> {
+    pub fn view_posts(pool: web::Data<PgPool>, channel_id: i32) -> QueryResult<Vec<Post>> {
         let conn = &pool.get().unwrap();
         posts::table
-            .filter(posts::channels_slug.eq(slug))
+            .filter(posts::channels_id.eq(channel_id))
             .order(posts::created_at.desc())
             .get_results(conn)
     }
