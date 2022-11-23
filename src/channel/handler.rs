@@ -65,17 +65,43 @@ async fn check_channel(
     }
 }
 
-
 #[put("/")]
 async fn update_channel_data(
     pool: web::Data<PgPool>,
     payload: web::Json<UpdateChannelPayload>,
 ) -> HttpResponse {
-    let channel_update = Channel::update(pool, payload);
+    match payload.channel_name.clone() {
+        Some(channel_name) => {
+            let existing_channel = Channel::check_channel(pool.clone(), &channel_name);
 
-    match channel_update {
-        Ok(update) => HttpResponse::Ok().json(update),
-        Err(err) => HttpResponse::InternalServerError().body(format!("Error : {:?}", err)),
+            match existing_channel {
+                Ok(channel) => {
+                    let res = ChannelErrorRes::new(format!(
+                        "Channel dengan nama {} sudah terdaftar !",
+                        channel.channel_name
+                    ));
+                    HttpResponse::BadRequest().json(res)
+                }
+                Err(_) => {
+                    let channel_update = Channel::update(pool, payload);
+
+                    match channel_update {
+                        Ok(update) => HttpResponse::Ok().json(update),
+                        Err(err) => {
+                            HttpResponse::InternalServerError().body(format!("Error : {:?}", err))
+                        }
+                    }
+                }
+            }
+        }
+        None => {
+            let channel_update = Channel::update(pool, payload);
+
+            match channel_update {
+                Ok(update) => HttpResponse::Ok().json(update),
+                Err(err) => HttpResponse::InternalServerError().body(format!("Error : {:?}", err)),
+            }
+        }
     }
 }
 
