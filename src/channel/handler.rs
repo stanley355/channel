@@ -65,7 +65,7 @@ async fn check_channel(
     }
 }
 
-#[put("/")]
+#[put("/subscribers/")]
 async fn update_channel_subscribers(
     pool: web::Data<PgPool>,
     param: web::Query<UpdateChannelParam>,
