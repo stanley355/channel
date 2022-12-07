@@ -11,6 +11,7 @@ pub struct CreateChannelPayload {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CheckChannelParam {
+    pub id: Option<i32>,
     pub owner_id: Option<String>,
     pub slug: Option<String>,
 }

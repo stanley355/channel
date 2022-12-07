@@ -52,6 +52,14 @@ impl Channel {
             .get_result(conn)
     }
 
+    pub fn check_channel_by_id(pool: web::Data<PgPool>, id: i32) -> QueryResult<Channel> {
+        let conn = &pool.get().unwrap();
+
+        channels::table
+            .filter(channels::id.eq(&id))
+            .get_result(conn)
+    }
+
     pub fn create_channel_slug(channel_name: String) -> String {
         channel_name.trim().replace(" ", "-").to_lowercase()
     }

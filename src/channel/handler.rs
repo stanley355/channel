@@ -43,7 +43,17 @@ async fn check_channel(
     pool: web::Data<PgPool>,
     param: web::Query<CheckChannelParam>,
 ) -> HttpResponse {
-    if let Some(owner_id) = param.owner_id.clone() {
+    if let Some(id) = param.id.clone() {
+        let channel_exist = Channel::check_channel_by_id(pool, id);
+
+        match channel_exist {
+            Ok(channel) => {
+                let token = Channel::hash_channel_data(channel);
+                HttpResponse::Ok().json(ChannelTokenRes::new(token))
+            }
+            Err(_) => HttpResponse::BadRequest().body("Error: Channel doesn't exist!"),
+        }
+    } else if let Some(owner_id) = param.owner_id.clone() {
         let channel_exist = Channel::check_channel_by_owner(pool, owner_id);
 
         match channel_exist {
