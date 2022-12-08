@@ -60,6 +60,17 @@ impl Channel {
             .get_result(conn)
     }
 
+    pub fn find_subscribed_channels(
+        pool: web::Data<PgPool>,
+        id_list: Vec<i32>,
+    ) -> QueryResult<Vec<Channel>> {
+        let conn = &pool.get().unwrap();
+
+        channels::table
+            .filter(channels::id.eq_any(&id_list))
+            .get_results(conn)
+    }
+
     pub fn create_channel_slug(channel_name: String) -> String {
         channel_name.trim().replace(" ", "-").to_lowercase()
     }

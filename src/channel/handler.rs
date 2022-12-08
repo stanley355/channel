@@ -75,6 +75,19 @@ async fn check_channel(
     }
 }
 
+#[get("/subscriptions/")]
+async fn find_subscribed_channels(
+    pool: web::Data<PgPool>,
+    param: web::Json<FindSubscribedChannelsPayload>,
+) -> HttpResponse {
+    let channels_res = Channel::find_subscribed_channels(pool, param.id_list.clone());
+
+    match channels_res {
+        Ok(channels) => HttpResponse::Ok().json(channels),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error : {:?}", err))
+    }
+}
+
 #[put("/")]
 async fn update_channel_data(
     pool: web::Data<PgPool>,
@@ -144,6 +157,7 @@ pub fn route(config: &mut web::ServiceConfig) {
     config
         .service(create_channel)
         .service(check_channel)
+        .service(find_subscribed_channels)
         .service(update_channel_data)
         .service(update_channel_subscribers)
         .service(search_similar_channel);
