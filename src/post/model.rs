@@ -110,4 +110,17 @@ impl Post {
             .select(selection.nullable())
             .get_results::<Option<HomePost>>(conn)
     }
+
+    pub fn update_channel(
+        pool: web::Data<PgPool>,
+        channel_id: i32,
+        channel_slug: String
+    ) -> QueryResult<Post> {
+        let conn = &pool.get().unwrap();
+
+        diesel::update(posts::table)
+            .filter(posts::channels_id.eq(channel_id))
+            .set(posts::channels_slug.eq(channel_slug))
+            .get_result(conn)
+    }
 }

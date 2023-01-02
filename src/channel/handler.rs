@@ -2,6 +2,7 @@ use super::model::Channel;
 use super::req::*;
 use super::res::{ChannelErrorRes, ChannelTokenRes};
 use crate::db::PgPool;
+use crate::post::model::Post;
 use actix_web::{get, post, put, web, HttpResponse};
 
 #[post("/")]
@@ -84,7 +85,7 @@ async fn find_subscribed_channels(
 
     match channels_res {
         Ok(channels) => HttpResponse::Ok().json(channels),
-        Err(err) => HttpResponse::InternalServerError().body(format!("Error : {:?}", err))
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error : {:?}", err)),
     }
 }
 
@@ -106,10 +107,18 @@ async fn update_channel_data(
                     HttpResponse::BadRequest().json(res)
                 }
                 Err(_) => {
-                    let channel_update = Channel::update(pool, payload);
+                    let channel_update = Channel::update(pool.clone(), payload);
 
                     match channel_update {
-                        Ok(update) => HttpResponse::Ok().json(update),
+                        Ok(channel) => {
+                            let _post_channel_update = Post::update_channel(
+                                pool,
+                                channel.id.clone(),
+                                channel.slug.clone(),
+                            );
+
+                            HttpResponse::Ok().json(channel)
+                        }
                         Err(err) => {
                             HttpResponse::InternalServerError().body(format!("Error : {:?}", err))
                         }
