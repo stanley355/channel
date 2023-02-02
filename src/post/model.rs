@@ -21,6 +21,7 @@ pub struct Post {
     likes: i32,
     post_type: String,
     is_free: bool,
+    title: Option<String>,
 }
 
 impl Post {
@@ -38,6 +39,7 @@ impl Post {
             (posts::description.eq(&body.description)),
             (posts::post_type.eq(&post_type)),
             (posts::is_free.eq(&body.is_free)),
+            (posts::title.eq(&body.title))
         );
 
         diesel::insert_into(posts::table)
@@ -66,6 +68,7 @@ impl Post {
             posts::likes,
             posts::post_type,
             posts::is_free,
+            posts::title,
             channels::channel_name,
             channels::profile_img_url,
         );
@@ -94,6 +97,7 @@ impl Post {
             posts::likes,
             posts::post_type,
             posts::is_free,
+            posts::title,
             channels::channel_name,
             channels::profile_img_url,
         );

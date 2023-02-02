@@ -9,6 +9,7 @@ pub struct CreatePostPayload {
     pub description: String,
     pub post_type: PostType,
     pub is_free: bool,
+    pub title: String
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

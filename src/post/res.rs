@@ -12,6 +12,7 @@ pub struct HomePost {
     likes: i32,
     post_type: String,
     is_free: bool,
+    title: Option<String>,
     channel_name: String,
     profile_img_url: Option<String>,
 }
