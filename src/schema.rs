@@ -27,6 +27,7 @@ diesel::table! {
         likes -> Int4,
         post_type -> Varchar,
         is_free -> Bool,
+        title -> Nullable<Varchar>,
     }
 }
 
