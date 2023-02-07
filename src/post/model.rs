@@ -109,7 +109,7 @@ impl Post {
                     .or(posts::is_free.eq(true)),
             )
             .order(posts::created_at.desc())
-            .limit(20)
+            .limit(40)
             .left_join(channels::table.on(posts::channels_id.eq(channels::id)))
             .select(selection.nullable())
             .get_results::<Option<HomePost>>(conn)
